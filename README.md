@@ -1,126 +1,82 @@
 # Android_Volley_Basics
 Using Volley Library to fetch data from the API
 
+# Dependency
+```
+implementation 'com.android.volley:volley:1.2.1'
+```
+
 # Code
 
 #### 1st Activity 
 ```
+TextView textView;
 Button button;
-TextInputLayout textInputEditText;
+LinearLayout linearLayout;
 
-PRDownloader.initialize(getApplicationContext());
+RequestQueue requestQueue;
 
-         button.setOnClickListener(new View.OnClickListener() {
+        //whenever you want to fetch data from the API you create a request queue
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //if permission granted then download the file
-                Dexter.withContext(MainActivity.this)
-                        .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .withListener(new PermissionListener() {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                //url of API
+                String url = "https://mocki.io/v1/db6249d4-0ee1-4bae-a948-82d92c7d1ebc";
 
-                                //extract the url
-                                String givenUrl = textInputEditText.getEditText().getText().toString();
-                                if (!givenUrl.equals("")) {
-                                    String fileName = URLUtil.guessFileName(givenUrl, null, null);
-                                    downloadFile(givenUrl, fileName, v);
-                                } else
-                                    Toast.makeText(MainActivity.this, "Please Give URL", Toast.LENGTH_SHORT).show();
+                //if you see it is first object then array so...
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
+                        try {
+
+                            //we want array (from the object) so...
+                            JSONArray jsonArray = response.getJSONArray("student");
+
+                            //now we have 3 items in array students[] (just we got)
+                            for (int i = 0; i < jsonArray.length(); i++) {
+
+                                //we are having objects (name, email, age) so...
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                String name = jsonObject.getString("name");
+                                String email = jsonObject.getString("email");
+                                int age = jsonObject.getInt("age");
+
+                                //Just Appending the data to already existing TextView
+                                textView.append(name + " " + email + " " + String.valueOf(age) + "\n");
+
+                                //Creating TextView and Adding in the Layout
+                                TextView textView2 = new TextView(MainActivity.this);
+                                textView2.setText(name + " " + email + " " + String.valueOf(age) + "\n");
+                                linearLayout.addView(textView2);
                             }
 
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                                Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                                permissionToken.continuePermissionRequest();
-                            }
-                        }).check();
-            }
-        });
-        
-        private void downloadFile(String givenUrl, String fileName, View view) {
-
-        //setting the progress bar
-        ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setMessage("Downloading...");
-        progressDialog.setCancelable(false);
-        progressDialog.onBackPressed();
-        progressDialog.show();
-
-        File fileDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-        PRDownloader.download(givenUrl, fileDir.toString(), fileName)
-                .build()
-                .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                    @Override
-                    public void onStartOrResume() {
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                     }
-                })
-                .setOnPauseListener(new OnPauseListener() {
+                }, new Response.ErrorListener() {
                     @Override
-                    public void onPause() {
-
-                    }
-                })
-                .setOnCancelListener(new OnCancelListener() {
-                    @Override
-                    public void onCancel() {
-
-                    }
-                })
-                .setOnProgressListener(new OnProgressListener() {
-                    @Override
-                    public void onProgress(Progress progress) {
-
-                        //convert progress into progress
-                        long percent = progress.currentBytes * 100 / progress.totalBytes;
-                        progressDialog.setMessage("Downloaded " + percent + "%");
-                    }
-                })
-                .start(new OnDownloadListener() {
-                    @Override
-                    public void onDownloadComplete() {
-                        progressDialog.dismiss();
-
-                        //show an snackBar on download complete
-                        Snackbar.make(view, fileName + " Downloaded", Snackbar.LENGTH_LONG)
-                                .setAction("Downloads", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        //show the recently downloaded
-//                                        startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
-
-                                        Uri selectedUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                                        intent.setDataAndType(selectedUri, "resource/folder");
-
-                                        startActivity(intent);
-                                    }
-                                }).show();
-
-//                        Toast.makeText(MainActivity.this, fileName + " Downloaded", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        progressDialog.dismiss();
-                        Toast.makeText(MainActivity.this, "Error in Download", Toast.LENGTH_SHORT).show();
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
 
+                //add this request to request queue
+                requestQueue.add(jsonObjectRequest);
+            }
+        });
+    }
+}
 ```
 
 # App Highlight
 
-<img src="app_images/PRDownloader Code.png" /><br>
+<img src="app_images/Volley API Basic Code.png" /><br>
 
-<img src="app_images/PRDownloader App1.png" width="300" /> <img src="app_images/PRDownloader App3.png" width="300" /> <img src="app_images/PRDownloader App2.png" width="300" /><br>
+<img src="app_images/Volley API Basic App.png" width="300" />
