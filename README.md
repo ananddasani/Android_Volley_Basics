@@ -6,6 +6,11 @@ Using Volley Library to fetch data from the API
 implementation 'com.android.volley:volley:1.2.1'
 ```
 
+- If String Request
+```
+implementation 'com.google.code.gson:gson:2.8.9'
+```
+
 # Code
 
 #### 1st Activity 
