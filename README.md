@@ -1,6 +1,8 @@
 # Android_Volley_Basics
 Using Volley Library to fetch data from the API
 
+This topic is a part of [My Complete Andorid Course](https://github.com/ananddasani/Android_Apps)
+
 # Dependency
 ```
 implementation 'com.android.volley:volley:1.2.1'
@@ -81,7 +83,6 @@ RequestQueue requestQueue;
 ```
 
 # App Highlight
+![Volley API Basic App](https://user-images.githubusercontent.com/74413402/192093519-8204a30f-1e44-4eed-8187-a3efb49c747d.png)
+![Volley API Basic Code](https://user-images.githubusercontent.com/74413402/192093521-f440ebf5-4237-4a42-9870-aafaab628040.png)
 
-<img src="app_images/Volley API Basic Code.png" /><br>
-
-<img src="app_images/Volley API Basic App.png" width="300" />
